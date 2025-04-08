@@ -5,7 +5,6 @@ import SearchBar from "@/components/SearchBar";
 import CurrentWeather from "@/components/CurrentWeather";
 import WeatherForecast from "@/components/WeatherForecast";
 import WeatherSkeleton from "@/components/WeatherSkeleton";
-import ApiKeyInput from "@/components/ApiKeyInput";
 import { 
   getWeatherByCity, 
   getForecastByCity, 
@@ -19,7 +18,6 @@ const DEFAULT_CITY = "London";
 
 const Index = () => {
   const { toast } = useToast();
-  const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem("weatherApiKey"));
   const [city, setCity] = useState<string>("");
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
@@ -27,54 +25,14 @@ const Index = () => {
   const [weatherCondition, setWeatherCondition] = useState<string>("sunny");
 
   useEffect(() => {
-    if (apiKey) {
-      fetchWeatherData(DEFAULT_CITY);
-    }
-  }, [apiKey]);
-
-  const handleApiKeySubmit = (key: string) => {
-    localStorage.setItem("weatherApiKey", key);
-    setApiKey(key);
     fetchWeatherData(DEFAULT_CITY);
-  };
+  }, []);
 
   const fetchWeatherData = async (searchCity: string) => {
-    if (!apiKey) return;
-
     setLoading(true);
     try {
-      // Update the API key in the code
-      const weatherServiceModule = await import("@/services/weatherService");
-      const originalGetWeatherByCity = weatherServiceModule.getWeatherByCity;
-      const originalGetForecastByCity = weatherServiceModule.getForecastByCity;
-
-      // Override the functions to use the user's API key
-      weatherServiceModule.getWeatherByCity = async (city: string) => {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
-        );
-        
-        if (!response.ok) {
-          throw new Error("Weather data not found");
-        }
-        
-        return await response.json();
-      };
-
-      weatherServiceModule.getForecastByCity = async (city: string) => {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
-        );
-        
-        if (!response.ok) {
-          throw new Error("Forecast data not found");
-        }
-        
-        return await response.json();
-      };
-
-      // Fetch data with the updated functions
-      const weather = await weatherServiceModule.getWeatherByCity(searchCity);
+      // Fetch current weather data
+      const weather = await getWeatherByCity(searchCity);
       setWeatherData(weather);
       setCity(weather.name);
 
@@ -83,12 +41,8 @@ const Index = () => {
       setWeatherCondition(condition);
 
       // Fetch forecast data
-      const forecast = await weatherServiceModule.getForecastByCity(searchCity);
+      const forecast = await getForecastByCity(searchCity);
       setForecastData(forecast);
-
-      // Restore original functions
-      weatherServiceModule.getWeatherByCity = originalGetWeatherByCity;
-      weatherServiceModule.getForecastByCity = originalGetForecastByCity;
     } catch (error) {
       toast({
         title: "Error",
@@ -135,26 +89,20 @@ const Index = () => {
           Weather App
         </h1>
         
-        {!apiKey ? (
-          <ApiKeyInput onApiKeySubmit={handleApiKeySubmit} />
-        ) : (
-          <>
-            <SearchBar onSearch={handleSearch} isLoading={loading} />
-            
-            <div className="mt-6">
-              {loading ? (
-                <WeatherSkeleton />
-              ) : (
-                weatherData && (
-                  <>
-                    <CurrentWeather data={weatherData} />
-                    {forecastData && <WeatherForecast data={forecastData} />}
-                  </>
-                )
-              )}
-            </div>
-          </>
-        )}
+        <SearchBar onSearch={handleSearch} isLoading={loading} />
+        
+        <div className="mt-6">
+          {loading ? (
+            <WeatherSkeleton />
+          ) : (
+            weatherData && (
+              <>
+                <CurrentWeather data={weatherData} />
+                {forecastData && <WeatherForecast data={forecastData} />}
+              </>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
