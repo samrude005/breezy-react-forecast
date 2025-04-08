@@ -1,4 +1,3 @@
-
 // OpenWeatherMap API configuration
 const API_KEY = "4d8fb5b93d4af21d66a2948710284366"; // Free API key for demo purposes
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
@@ -29,6 +28,7 @@ export interface WeatherData {
     sunset: number;
   };
   dt: number;
+  visibility?: number;
 }
 
 export interface ForecastData {
@@ -53,6 +53,25 @@ export interface ForecastData {
     name: string;
     country: string;
   };
+}
+
+export interface PollutionData {
+  list: {
+    dt: number;
+    main: {
+      aqi: number; // 1-5 scale (1: Good, 2: Fair, 3: Moderate, 4: Poor, 5: Very Poor)
+    };
+    components: {
+      co: number;    // Carbon monoxide (μg/m3)
+      no: number;    // Nitrogen monoxide (μg/m3)
+      no2: number;   // Nitrogen dioxide (μg/m3)
+      o3: number;    // Ozone (μg/m3)
+      so2: number;   // Sulphur dioxide (μg/m3)
+      pm2_5: number; // Fine particles (μg/m3)
+      pm10: number;  // Coarse particles (μg/m3)
+      nh3: number;   // Ammonia (μg/m3)
+    };
+  }[];
 }
 
 export const getWeatherByCity = async (city: string): Promise<WeatherData> => {
@@ -85,6 +104,23 @@ export const getForecastByCity = async (city: string): Promise<ForecastData> => 
     return await response.json();
   } catch (error) {
     console.error("Error fetching forecast data:", error);
+    throw error;
+  }
+};
+
+export const getAirPollutionByCoords = async (lat: number, lon: number): Promise<PollutionData> => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+    );
+    
+    if (!response.ok) {
+      throw new Error("Air pollution data not found");
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching air pollution data:", error);
     throw error;
   }
 };
@@ -127,4 +163,28 @@ export const getDayFromTimestamp = (timestamp: number): string => {
   return new Date(timestamp * 1000).toLocaleDateString(undefined, {
     weekday: 'short'
   });
+};
+
+// Helper function to get air quality text based on AQI value
+export const getAirQualityText = (aqi: number): string => {
+  switch(aqi) {
+    case 1: return "Good";
+    case 2: return "Fair";
+    case 3: return "Moderate";
+    case 4: return "Poor";
+    case 5: return "Very Poor";
+    default: return "Unknown";
+  }
+};
+
+// Helper function to get air quality color based on AQI value
+export const getAirQualityColor = (aqi: number): string => {
+  switch(aqi) {
+    case 1: return "text-green-500";
+    case 2: return "text-green-300";
+    case 3: return "text-yellow-500";
+    case 4: return "text-orange-500";
+    case 5: return "text-red-500";
+    default: return "text-gray-500";
+  }
 };

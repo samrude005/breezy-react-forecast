@@ -4,13 +4,17 @@ import { useToast } from "@/components/ui/use-toast";
 import SearchBar from "@/components/SearchBar";
 import CurrentWeather from "@/components/CurrentWeather";
 import WeatherForecast from "@/components/WeatherForecast";
+import TemperatureChart from "@/components/TemperatureChart";
+import AirPollution from "@/components/AirPollution";
 import WeatherSkeleton from "@/components/WeatherSkeleton";
 import { 
   getWeatherByCity, 
-  getForecastByCity, 
+  getForecastByCity,
+  getAirPollutionByCoords,
   getWeatherCondition,
   WeatherData,
-  ForecastData
+  ForecastData,
+  PollutionData
 } from "@/services/weatherService";
 import { Cloud, CloudRain, CloudLightning, Snowflake, Sun } from "lucide-react";
 
@@ -21,6 +25,7 @@ const Index = () => {
   const [city, setCity] = useState<string>("");
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
+  const [pollutionData, setPollutionData] = useState<PollutionData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [weatherCondition, setWeatherCondition] = useState<string>("sunny");
 
@@ -43,6 +48,13 @@ const Index = () => {
       // Fetch forecast data
       const forecast = await getForecastByCity(searchCity);
       setForecastData(forecast);
+
+      // Fetch air pollution data (needs lat/lon from weather data)
+      const pollution = await getAirPollutionByCoords(
+        weather.coord.lat,
+        weather.coord.lon
+      );
+      setPollutionData(pollution);
     } catch (error) {
       toast({
         title: "Error",
@@ -81,7 +93,7 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-all duration-500 ${getBackgroundClass()}`}>
+    <div className={`min-h-screen flex flex-col items-center py-8 px-4 transition-all duration-500 ${getBackgroundClass()}`}>
       <div className="relative w-full max-w-md">
         {getWeatherIcon()}
         
@@ -91,13 +103,15 @@ const Index = () => {
         
         <SearchBar onSearch={handleSearch} isLoading={loading} />
         
-        <div className="mt-6">
+        <div className="mt-6 space-y-4">
           {loading ? (
             <WeatherSkeleton />
           ) : (
             weatherData && (
               <>
                 <CurrentWeather data={weatherData} />
+                {forecastData && <TemperatureChart data={forecastData} />}
+                {pollutionData && <AirPollution data={pollutionData} />}
                 {forecastData && <WeatherForecast data={forecastData} />}
               </>
             )
