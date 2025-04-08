@@ -29,6 +29,10 @@ export interface WeatherData {
   };
   dt: number;
   visibility?: number;
+  coord: {
+    lat: number;
+    lon: number;
+  };
 }
 
 export interface ForecastData {
