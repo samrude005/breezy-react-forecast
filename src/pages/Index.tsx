@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import SearchBar from "@/components/SearchBar";
@@ -18,7 +17,7 @@ import {
 } from "@/services/weatherService";
 import { Cloud, CloudRain, CloudLightning, Snowflake, Sun } from "lucide-react";
 
-const DEFAULT_CITY = "London";
+const DEFAULT_CITY = "Nashik";
 
 const Index = () => {
   const { toast } = useToast();
