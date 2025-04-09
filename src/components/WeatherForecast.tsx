@@ -1,11 +1,15 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getDayFromTimestamp } from "@/services/weatherService";
+import { ForecastData, getDayFromTimestamp } from "@/services/weatherService";
 import WeatherIcon from "./WeatherIcon";
 import { Umbrella, Droplets, Wind } from "lucide-react";
 
-const WeatherForecast = ({ data }) => {
+interface WeatherForecastProps {
+  data: ForecastData;
+}
+
+const WeatherForecast: React.FC<WeatherForecastProps> = ({ data }) => {
   if (!data || !data.list || data.list.length === 0) return null;
 
   // Process forecast data to get one entry per day

@@ -10,8 +10,18 @@ import {
   CloudFog
 } from "lucide-react";
 
-const WeatherIcon = ({ weatherCode, size = 24, className = "" }) => {
-  const getIconByWeatherCode = (code) => {
+interface WeatherIconProps {
+  weatherCode: number;
+  size?: number;
+  className?: string;
+}
+
+const WeatherIcon: React.FC<WeatherIconProps> = ({ 
+  weatherCode, 
+  size = 24,
+  className = ""
+}) => {
+  const getIconByWeatherCode = (code: number) => {
     if (code >= 200 && code < 300) {
       return <CloudLightning size={size} className={className} />;  // Thunderstorm
     }

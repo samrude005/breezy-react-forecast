@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const WeatherSkeleton = () => {
+const WeatherSkeleton: React.FC = () => {
   return (
     <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-lg">
       <CardContent className="pt-6">

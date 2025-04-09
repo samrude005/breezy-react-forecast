@@ -1,12 +1,17 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ForecastData } from "@/services/weatherService";
 import { ChartContainer } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { formatTime } from "@/services/weatherService";
 import { Thermometer } from "lucide-react";
 
-const TemperatureChart = ({ data }) => {
+interface TemperatureChartProps {
+  data: ForecastData;
+}
+
+const TemperatureChart: React.FC<TemperatureChartProps> = ({ data }) => {
   if (!data || !data.list || data.list.length === 0) return null;
 
   // Get the next 24 hours forecast (8 data points, 3 hours apart)
