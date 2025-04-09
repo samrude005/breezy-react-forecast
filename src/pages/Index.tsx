@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import SearchBar from "@/components/SearchBar";
@@ -6,6 +7,7 @@ import WeatherForecast from "@/components/WeatherForecast";
 import TemperatureChart from "@/components/TemperatureChart";
 import AirPollution from "@/components/AirPollution";
 import WeatherSkeleton from "@/components/WeatherSkeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   getWeatherByCity, 
   getForecastByCity,
@@ -21,6 +23,7 @@ const DEFAULT_CITY = "Nashik";
 
 const Index = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [city, setCity] = useState<string>("");
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [forecastData, setForecastData] = useState<ForecastData | null>(null);
@@ -77,32 +80,32 @@ const Index = () => {
   const getWeatherIcon = () => {
     switch (weatherCondition) {
       case "sunny":
-        return <Sun className="absolute top-10 right-10 text-yellow-300 opacity-20" size={100} />;
+        return <Sun className="absolute top-5 right-5 md:top-10 md:right-10 text-yellow-300 opacity-20" size={isMobile ? 60 : 100} />;
       case "cloudy":
-        return <Cloud className="absolute top-10 right-10 text-gray-300 opacity-20" size={100} />;
+        return <Cloud className="absolute top-5 right-5 md:top-10 md:right-10 text-gray-300 opacity-20" size={isMobile ? 60 : 100} />;
       case "rainy":
-        return <CloudRain className="absolute top-10 right-10 text-blue-300 opacity-20" size={100} />;
+        return <CloudRain className="absolute top-5 right-5 md:top-10 md:right-10 text-blue-300 opacity-20" size={isMobile ? 60 : 100} />;
       case "stormy":
-        return <CloudLightning className="absolute top-10 right-10 text-gray-300 opacity-20" size={100} />;
+        return <CloudLightning className="absolute top-5 right-5 md:top-10 md:right-10 text-gray-300 opacity-20" size={isMobile ? 60 : 100} />;
       case "snowy":
-        return <Snowflake className="absolute top-10 right-10 text-white opacity-20" size={100} />;
+        return <Snowflake className="absolute top-5 right-5 md:top-10 md:right-10 text-white opacity-20" size={isMobile ? 60 : 100} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center py-8 px-4 transition-all duration-500 ${getBackgroundClass()}`}>
-      <div className="relative w-full max-w-md">
+    <div className={`min-h-screen flex flex-col items-center py-4 md:py-8 px-2 md:px-4 transition-all duration-500 ${getBackgroundClass()}`}>
+      <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg">
         {getWeatherIcon()}
         
-        <h1 className="text-3xl font-bold text-white text-center mb-8 drop-shadow-md">
+        <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-4 md:mb-8 drop-shadow-md">
           Weather App
         </h1>
         
         <SearchBar onSearch={handleSearch} isLoading={loading} />
         
-        <div className="mt-6 space-y-4">
+        <div className="mt-4 md:mt-6 space-y-3 md:space-y-4">
           {loading ? (
             <WeatherSkeleton />
           ) : (
