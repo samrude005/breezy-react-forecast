@@ -1,18 +1,18 @@
 
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import SearchBar from "@/components/SearchBar";
-import CurrentWeather from "@/components/CurrentWeather";
-import WeatherForecast from "@/components/WeatherForecast";
-import TemperatureChart from "@/components/TemperatureChart";
-import AirPollution from "@/components/AirPollution";
-import WeatherSkeleton from "@/components/WeatherSkeleton";
+import SearchBar from "@/components/SearchBar.jsx";
+import CurrentWeather from "@/components/CurrentWeather.jsx";
+import WeatherForecast from "@/components/WeatherForecast.jsx";
+import TemperatureChart from "@/components/TemperatureChart.jsx";
+import AirPollution from "@/components/AirPollution.jsx";
+import WeatherSkeleton from "@/components/WeatherSkeleton.jsx";
 import { 
   getWeatherByCity, 
   getForecastByCity,
   getAirPollutionByCoords,
   getWeatherCondition
-} from "@/services/weatherService";
+} from "@/services/weatherService.js";
 import { Cloud, CloudRain, CloudLightning, Snowflake, Sun } from "lucide-react";
 
 const DEFAULT_CITY = "London";
