@@ -1,0 +1,122 @@
+
+import React, { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import SearchBar from "@/components/SearchBar";
+import CurrentWeather from "@/components/CurrentWeather";
+import WeatherForecast from "@/components/WeatherForecast";
+import TemperatureChart from "@/components/TemperatureChart";
+import AirPollution from "@/components/AirPollution";
+import WeatherSkeleton from "@/components/WeatherSkeleton";
+import { 
+  getWeatherByCity, 
+  getForecastByCity,
+  getAirPollutionByCoords,
+  getWeatherCondition
+} from "@/services/weatherService";
+import { Cloud, CloudRain, CloudLightning, Snowflake, Sun } from "lucide-react";
+
+const DEFAULT_CITY = "London";
+
+const Index = () => {
+  const { toast } = useToast();
+  const [city, setCity] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
+  const [forecastData, setForecastData] = useState(null);
+  const [pollutionData, setPollutionData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [weatherCondition, setWeatherCondition] = useState("sunny");
+
+  useEffect(() => {
+    fetchWeatherData(DEFAULT_CITY);
+  }, []);
+
+  const fetchWeatherData = async (searchCity) => {
+    setLoading(true);
+    try {
+      // Fetch current weather data
+      const weather = await getWeatherByCity(searchCity);
+      setWeatherData(weather);
+      setCity(weather.name);
+
+      // Set weather condition for background
+      const condition = getWeatherCondition(weather.weather[0].id);
+      setWeatherCondition(condition);
+
+      // Fetch forecast data
+      const forecast = await getForecastByCity(searchCity);
+      setForecastData(forecast);
+
+      // Fetch air pollution data (needs lat/lon from weather data)
+      const pollution = await getAirPollutionByCoords(
+        weather.coord.lat,
+        weather.coord.lon
+      );
+      setPollutionData(pollution);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Could not find weather for "${searchCity}". Please try another city.`,
+        variant: "destructive",
+      });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (searchCity) => {
+    fetchWeatherData(searchCity);
+  };
+
+  const getBackgroundClass = () => {
+    return `weather-bg-${weatherCondition}`;
+  };
+
+  const getWeatherIcon = () => {
+    switch (weatherCondition) {
+      case "sunny":
+        return <Sun className="absolute top-10 right-10 text-yellow-300 opacity-20" size={100} />;
+      case "cloudy":
+        return <Cloud className="absolute top-10 right-10 text-gray-300 opacity-20" size={100} />;
+      case "rainy":
+        return <CloudRain className="absolute top-10 right-10 text-blue-300 opacity-20" size={100} />;
+      case "stormy":
+        return <CloudLightning className="absolute top-10 right-10 text-gray-300 opacity-20" size={100} />;
+      case "snowy":
+        return <Snowflake className="absolute top-10 right-10 text-white opacity-20" size={100} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`min-h-screen flex flex-col items-center py-8 px-4 transition-all duration-500 ${getBackgroundClass()}`}>
+      <div className="relative w-full max-w-md">
+        {getWeatherIcon()}
+        
+        <h1 className="text-3xl font-bold text-white text-center mb-8 drop-shadow-md">
+          Weather App
+        </h1>
+        
+        <SearchBar onSearch={handleSearch} isLoading={loading} />
+        
+        <div className="mt-6 space-y-4">
+          {loading ? (
+            <WeatherSkeleton />
+          ) : (
+            weatherData && (
+              <>
+                <CurrentWeather data={weatherData} />
+                {forecastData && <TemperatureChart data={forecastData} />}
+                {pollutionData && <AirPollution data={pollutionData} />}
+                {forecastData && <WeatherForecast data={forecastData} />}
+              </>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Index;
