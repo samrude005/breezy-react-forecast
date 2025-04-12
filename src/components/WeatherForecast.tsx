@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ForecastData, getDayFromTimestamp } from "@/services/weatherService";
@@ -68,21 +69,32 @@ const WeatherForecast: React.FC<WeatherForecastProps> = ({ data }) => {
         <h3 className="text-lg md:text-xl font-semibold mb-2 md:mb-4">
           {isMobile ? "3-Day" : "5-Day"} Forecast
         </h3>
-        <div className={`grid grid-cols-${isMobile ? '3' : '5'} gap-1 md:gap-2`}>
+        
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-1 md:gap-4">
           {dailyForecasts.map((item, index) => (
-            <div key={index} className="flex flex-col items-center p-1 md:p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <p className="text-xs md:text-sm font-medium">{getDayFromTimestamp(item.dt)}</p>
-              <WeatherIcon 
-                weatherCode={item.weather[0].id} 
-                size={isMobile ? 24 : 32} 
-                className="my-1 md:my-2 text-primary" 
-              />
-              <p className="text-xs md:text-sm font-bold">{Math.round(item.main.temp)}°C</p>
-              <p className="text-xs text-gray-500 mt-1 capitalize hidden md:block">{item.weather[0].description}</p>
+            <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-white/50 shadow-sm hover:bg-gray-100 transition-colors">
+              <p className="text-sm md:text-base font-medium">{getDayFromTimestamp(item.dt)}</p>
+              <div className="my-2 md:my-3">
+                <WeatherIcon 
+                  weatherCode={item.weather[0].id} 
+                  size={isMobile ? 28 : 36} 
+                  className="text-primary" 
+                />
+              </div>
+              <p className="text-sm md:text-lg font-bold">{Math.round(item.main.temp)}°C</p>
+              <p className="text-xs md:text-sm mt-1 text-gray-700 capitalize truncate max-w-full text-center">
+                {item.weather[0].description}
+              </p>
               
-              <div className="flex items-center mt-1 md:mt-2 text-xs text-gray-500">
-                <Droplets size={isMobile ? 10 : 12} className="mr-1" />
-                <span>{item.main.humidity}%</span>
+              <div className="flex justify-between w-full mt-2 text-xs md:text-sm text-gray-600">
+                <div className="flex items-center">
+                  <Droplets size={isMobile ? 12 : 14} className="mr-1" />
+                  <span>{item.main.humidity}%</span>
+                </div>
+                <div className="flex items-center">
+                  <Wind size={isMobile ? 12 : 14} className="mr-1" />
+                  <span>{item.wind?.speed || 0} m/s</span>
+                </div>
               </div>
             </div>
           ))}
